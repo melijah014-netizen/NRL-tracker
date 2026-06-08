@@ -1,6 +1,6 @@
 #PROJECT NAME: HT Edge
 
-OVERVIEW
+#OVERVIEW
 
 #Build a complete Android mobile application called HT Edge.
 
