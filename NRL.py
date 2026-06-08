@@ -1,4 +1,3 @@
-
 import streamlit as st
 
 # Configure the page style
