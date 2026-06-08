@@ -1,422 +1,72 @@
-#PROJECT NAME: HT Edge
 
-#OVERVIEW
-
-#Build a complete Android mobile application called HT Edge.
-
-#Purpose:
-#Predict NRL halftime winners and halftime margins (1-8 or 9+) using first-half statistics, team news, venue information, weather conditions, travel fatigue and historical data.
-
-#Target users:
-#Sports bettors who specialize in NRL halftime betting.
-
-Platform:
-Android first.
-
-Framework:
-Flutter (latest stable version).
-
-Backend:
-FastAPI (Python).
-
-Database:
-SQLite for local storage.
-Allow future migration to PostgreSQL.
-
-Architecture:
-Clean architecture.
-Separate UI, Services, Models, Database and Prediction Engine.
-
-====================================
-
-MAIN FEATURES
-
-====================================
-
-1. DASHBOARD
-
-Display:
-
-- Upcoming NRL matches
-- Round number
-- Match date and time
-- Venue
-- Home team
-- Away team
-
-Each match card should display:
-
-- Predicted halftime winner
-- Predicted halftime margin
-- Confidence score
-
-Example:
-
-Storm vs Broncos
-
-Prediction:
-Storm HT 9+
-
-Confidence:
-87%
-
-====================================
-
-2. MATCH ANALYSIS SCREEN
-
-Display complete prediction breakdown.
-
-Show:
-
-Predicted outcomes:
-
-- Home Team HT 1-8
-- Home Team HT 9+
-- Away Team HT 1-8
-- Away Team HT 9+
-
-Example:
-
-Storm HT 1-8 = 31%
-Storm HT 9+ = 47%
-Broncos HT 1-8 = 15%
-Broncos HT 9+ = 7%
-
-Display:
-
-Confidence Score
-
-Display:
-
-Reasons for prediction
-
-Example:
-
-+ Strong recent form
-+ Better completion rate
-+ Opponent missing halfback
-+ Strong record at venue
-
-====================================
-
-3. TEAM STATISTICS SCREEN
-
-Store and display:
-
-FIRST HALF ATTACK
-
-- Average first-half points scored
-- Average first-half tries scored
-- Average first-half line breaks
-- Average first-half tackle breaks
-- Average first-half run metres
-
-FIRST HALF DEFENCE
-
-- Average first-half points conceded
-- Average first-half tries conceded
-- Average first-half line breaks conceded
-- Average first-half missed tackles
-
-DISCIPLINE
-
-- First-half completion percentage
-- First-half errors
-- First-half penalties conceded
-- First-half six-again concessions
-
-POSSESSION
-
-- First-half possession %
-- First-half territory %
-
-GAME STARTING STRENGTH
-
-- Points scored in first 10 minutes
-- Points scored in first 20 minutes
-- Points conceded in first 10 minutes
-- Points conceded in first 20 minutes
-
-HALFTIME RECORD
-
-- Wins
-- Losses
-- Draws
-
-====================================
-
-4. TEAM NEWS SCREEN
-
-Store:
-
-- Injuries
-- Suspensions
-- Late withdrawals
-- Debutants
-- Positional changes
-
-Allow manual entry.
-
-Each change should trigger prediction recalculation.
-
-====================================
-
-5. BET TRACKER
-
-User can enter:
-
-- Match
-- Selection
-- Stake
-- Odds
-- Result
-
-Track:
-
-- Total bets
-- Wins
-- Losses
-- Strike rate
-- ROI
-- Profit/Loss
-
-Show graphs.
-
-====================================
-
-6. SETTINGS SCREEN
-
-Allow:
-
-- Weight adjustment
-- Dark mode
-- Light mode
-- Backup database
-- Restore database
-
-====================================
-
-PREDICTION ENGINE
-
-====================================
-
-Create a scoring engine.
-
-Factors and weights:
-
-First-half statistics = 35%
-
-Recent form = 20%
-
-Completion rate = 15%
-
-Injuries and lineup changes = 10%
-
-Venue performance = 7%
-
-Travel fatigue = 5%
-
-Weather = 3%
-
-Head-to-head history = 3%
-
-Market movement = 2%
-
-Total = 100%
-
-====================================
-
-RECENT FORM
-
-====================================
-
-Calculate:
-
-Last 3 matches
-
-Weight = 50%
-
-Last 5 matches
-
-Weight = 30%
-
-Season average
-
-Weight = 20%
-
-====================================
-
-VENUE FACTOR
-
-====================================
-
-Store:
-
-- Home record
-- Away record
-- Venue-specific halftime record
-- Average halftime margin at venue
-
-====================================
-
-TRAVEL FACTOR
-
-====================================
-
-Store:
-
-- Travel distance
-- Interstate travel
-- International travel
-- Days since last game
-
-====================================
-
-WEATHER FACTOR
-
-====================================
-
-Allow manual input:
-
-- Fine
-- Rain
-- Windy
-- Humid
-
-====================================
-
-MATCH TIMING FACTOR
-
-====================================
-
-Store:
-
-- Afternoon
-- Evening
-- Night
-
-Include in prediction calculations.
-
-====================================
-
-HEAD TO HEAD
-
-====================================
-
-Store:
-
-Last 5 meetings
-
-Last 10 meetings
-
-Venue-specific meetings
-
-Only use halftime results.
-
-====================================
-
-CONFIDENCE SCORE
-
-====================================
-
-Generate:
-
-0-100 score
-
-Classification:
-
-90-100 = Elite Play
-
-80-89 = Strong Play
-
-70-79 = Moderate Play
-
-60-69 = Risky Play
-
-Below 60 = Avoid
-
-====================================
-
-DATABASE TABLES
-
-====================================
-
-Teams
-
-Matches
-
-Players
-
-Injuries
-
-VenueData
-
-WeatherData
-
-TravelData
-
-TeamStatistics
-
-HeadToHead
-
-Predictions
-
-BetTracker
-
-Settings
-
-====================================
-
-UI DESIGN
-
-====================================
-
-Modern betting-style interface.
-
-Dark theme default.
-
-Use cards.
-
-Use charts.
-
-Use team logos.
-
-Responsive layout.
-
-Fast loading.
-
-====================================
-
-FUTURE FEATURES
-
-====================================
-
-Build architecture to support future APIs:
-
-- NRL statistics API
-- Odds API
-- Weather API
-- Injury API
-- News API
-
-Create placeholders for future integration.
-
-====================================
-
-DELIVERABLES
-
-====================================
-
-Generate:
-
-1. Complete Flutter project
-2. All source code
-3. Database models
-4. Prediction engine
-5. Sample data
-6. Android build instructions
-7. APK build instructions
-8. README.md
-9. Installation guide
-
-The application must compile successfully without errors.
+import streamlit as st
+
+# Configure the page style
+st.set_page_config(page_title="HT Edge - NRL Tracker", page_icon="🏉", layout="wide")
+
+# App Header
+st.title("🏉 HT Edge - NRL Halftime Tracker")
+st.markdown("### Predict NRL Halftime Winners and Margins")
+st.info("System Initialized: Ready to track upcoming NRL Round statistics.")
+
+# Sidebar Settings
+st.sidebar.header("⚙️ Settings & Weights")
+st.sidebar.subheader("Prediction Weights")
+st.sidebar.slider("First-Half Stats (%)", 0, 100, 35)
+st.sidebar.slider("Recent Form (%)", 0, 100, 20)
+st.sidebar.slider("Completion Rate (%)", 0, 100, 15)
+st.sidebar.selectbox("Weather Condition", ["Fine", "Rain", "Windy", "Humid"])
+theme = st.sidebar.radio("UI Theme", ["Dark Mode Default", "Light Mode"])
+
+# Create Layout Tabs
+tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "📈 Match Analysis", "🏅 Team Statistics", "📝 Bet Tracker"])
+
+with tab1:
+    st.subheader("Upcoming NRL Matches")
+    
+    # Sample Match Card 1
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        st.write("### ⚡ Storm vs Broncos")
+        st.caption("Venue: AAMI Park | Target: Halftime Betting Market")
+    with col2:
+        st.metric(label="Predicted Winner", value="Storm HT 9+")
+        st.progress(0.87, text="Confidence: 87% (Strong Play)")
+        
+    st.divider()
+
+with tab2:
+    st.subheader("Match Outcome Probability Breakdown")
+    st.write("#### Storm vs Broncos Matrix")
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Storm HT 1-8", "31%")
+    col2.metric("Storm HT 9+", "47%")
+    col3.metric("Broncos HT 1-8", "15%")
+    col4.metric("Broncos HT 9+", "7%")
+    
+    st.markdown("#### Key Drivers for Prediction:")
+    st.success("✔️ Strong home venue form and 84% completion rate over the last 3 matches.")
+    st.warning("⚠️ Opponent missing starting halfback due to late injury withdrawal.")
+
+with tab3:
+    st.subheader("Team First-Half Database Statistics")
+    team_select = st.selectbox("Select NRL Team", ["Melbourne Storm", "Brisbane Broncos", "Penrith Panthers", "Sydney Roosters"])
+    
+    sub_col1, sub_col2 = st.columns(2)
+    with sub_col1:
+        st.write("#### First Half Attack")
+        st.write("- **Avg 1H Points Scored:** 14.5")
+        st.write("- **Avg 1H Line Breaks:** 3.2")
+    with sub_col2:
+        st.write("#### First Half Defence")
+        st.write("- **Avg 1H Points Conceded:** 6.2")
+        st.write("- **Avg 1H Missed Tackles:** 8.4")
+
+with tab4:
+    st.subheader("Bet Tracker & ROI Dashboard")
+    st.caption("Track performance outcomes and calculate your live betting metrics.")
+    
+    metric_col1, metric_col2, metric_col3 = st.columns(3)
+    metric_col1.metric("Total Bets Placed", "0")
+    metric_col2.metric("Current Strike Rate", "0.0%")
+    metric_col3.metric("Profit / Loss (Units)", "0.00")
