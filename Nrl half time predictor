@@ -1,0 +1,25 @@
+Create a prediction engine for NRL halftime margins.
+
+Inputs:
+- First-half points scored
+- First-half points conceded
+- First-half completion rate
+- First-half errors
+- First-half penalties
+- Possession percentage
+- Territory percentage
+- Venue
+- Weather
+- Travel distance
+- Head-to-head history
+- Team form
+- Injuries
+- Lineup changes
+
+Outputs:
+- Team A HT 1-8 probability
+- Team A HT 9+ probability
+- Team B HT 1-8 probability
+- Team B HT 9+ probability
+
+Generate confidence score from 0-100.
