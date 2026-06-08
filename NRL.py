@@ -4,10 +4,10 @@ OVERVIEW
 
 #Build a complete Android mobile application called HT Edge.
 
-Purpose:
+#Purpose:
 Predict NRL halftime winners and halftime margins (1-8 or 9+) using first-half statistics, team news, venue information, weather conditions, travel fatigue and historical data.
 
-Target users:
+#Target users:
 Sports bettors who specialize in NRL halftime betting.
 
 Platform:
