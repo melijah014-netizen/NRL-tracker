@@ -90,3 +90,20 @@ sample_match_payload = {
 # Run a test of the predictive feature
 prediction = calculate_halftime_prediction(sample_match_payload)
 print(json.dumps(prediction, indent=4))
+import streamlit as st
+
+# This creates the title on your website
+st.title("🏆 NRL Live Halftime Predictor")
+st.write("Real-time data insights and margin projections.")
+
+# This runs the math formula using your match data
+prediction = calculate_halftime_prediction(sample_match_payload)
+
+# This displays the winner card
+st.subheader("Projected Halftime Leader:")
+st.info(prediction["predicted_halftime_leader"])
+
+# This displays the margin card
+st.subheader("Predicted Margin:")
+st.success(prediction["predicted_margin_bracket"])
+
