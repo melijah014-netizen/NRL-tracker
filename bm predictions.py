@@ -1,36 +1,12 @@
 import streamlit as st
 
-# DATABASE OF BASE TEAM STATS
-nrl_teams_db = {
-    "Brisbane Broncos": {"poss": 51, "comp": 78, "err": 10, "pen": 6, "hist_ht": 2.1},
-    "Canberra Raiders": {"poss": 49, "comp": 76, "err": 11, "pen": 7, "hist_ht": -0.5},
-    "Canterbury Bulldogs": {"poss": 50, "comp": 81, "err": 9, "pen": 5, "hist_ht": 1.2},
-    "Cronulla Sharks": {"poss": 52, "comp": 79, "err": 10, "pen": 6, "hist_ht": 3.4},
-    "Dolphins": {"poss": 48, "comp": 77, "err": 11, "pen": 6, "hist_ht": 0.8},
-    "Gold Coast Titans": {"poss": 47, "comp": 75, "err": 12, "pen": 8, "hist_ht": -2.1},
-    "Manly Sea Eagles": {"poss": 50, "comp": 78, "err": 10, "pen": 6, "hist_ht": 1.5},
-    "Melbourne Storm": {"poss": 53, "comp": 82, "err": 8, "pen": 5, "hist_ht": 4.8},
-    "Newcastle Knights": {"poss": 49, "comp": 77, "err": 11, "pen": 7, "hist_ht": -0.2},
-    "NZ Warriors": {"poss": 51, "comp": 80, "err": 9, "pen": 6, "hist_ht": 0.5},
-    "Nth Qld Cowboys": {"poss": 49, "comp": 76, "err": 11, "pen": 7, "hist_ht": -0.8},
-    "Parramatta Eels": {"poss": 48, "comp": 74, "err": 12, "pen": 8, "hist_ht": -3.0},
-    "Penrith Panthers": {"poss": 54, "comp": 83, "err": 8, "pen": 5, "hist_ht": 5.5},
-    "South Syd Rabbitohs": {"poss": 50, "comp": 77, "err": 11, "pen": 6, "hist_ht": -1.1},
-    "St George Dragons": {"poss": 47, "comp": 76, "err": 11, "pen": 7, "hist_ht": -1.8},
-    "Sydney Roosters": {"poss": 52, "comp": 79, "err": 10, "pen": 6, "hist_ht": 2.9},
-    "Wests Tigers": {"poss": 46, "comp": 73, "err": 13, "pen": 9, "hist_ht": -4.2}
-}
-
-def run_advanced_prediction(home_name, away_name, weather, h_injuries, a_injuries, h_turnaround, a_turnaround):
-    home = nrl_teams_db[home_name]
-    away = nrl_teams_db[away_name]
-    
-    # Adjust error severity based on weather
+def run_fully_manual_prediction(h_name, a_name, h_poss, a_poss, h_comp, a_comp, h_err, a_err, h_pen, a_pen, weather, h_injuries, a_injuries, h_turnaround, a_turnaround):
+    # Adjust error severity based on weather selection
     error_weight = 2.5 if weather == "Wet / Rain" else 1.5
     
-    # Base Calculation
-    h_score = (home["poss"] * 0.4) + (home["comp"] * 0.3) - (home["err"] * error_weight) - (home["pen"] * 2.0) + home["hist_ht"]
-    a_score = (away["poss"] * 0.4) + (away["comp"] * 0.3) - (away["err"] * error_weight) - (away["pen"] * 2.0) + away["hist_ht"]
+    # Mathematical Formula Processing Manual Inputs
+    h_score = (h_poss * 0.4) + (h_comp * 0.3) - (h_err * error_weight) - (h_pen * 2.0)
+    a_score = (a_poss * 0.4) + (a_comp * 0.3) - (a_err * error_weight) - (a_pen * 2.0)
     
     # Apply Injury Penalties (-2.5 points per missing key player)
     h_score -= (h_injuries * 2.5)
@@ -43,11 +19,12 @@ def run_advanced_prediction(home_name, away_name, weather, h_injuries, a_injurie
     margin = h_score - a_score
     abs_margin = abs(margin)
     
+    # Determine Winner and Custom 1-8 / 9+ Brackets
     if margin > 1.5:
-        winner = home_name
+        winner = h_name
         bracket = "1-8 points" if abs_margin <= 8 else "9+ points"
     elif margin < -1.5:
-        winner = away_name
+        winner = a_name
         bracket = "1-8 points" if abs_margin <= 8 else "9+ points"
     else:
         winner = "Draw / Even Match"
@@ -56,50 +33,66 @@ def run_advanced_prediction(home_name, away_name, weather, h_injuries, a_injurie
     return winner, bracket
 
 # STREAMLIT USER INTERFACE
-st.title("🏈 Advanced NRL HT Predictor")
-st.write("Customise match variables to generate real-time halftime predictions.")
+st.title("🏈 Manual NRL Halftime Predictor")
+st.write("Manually enter match statistics and variables to generate a prediction.")
 
 st.divider()
 
-# 1. Team Selection
-team_list = sorted(list(nrl_teams_db.keys()))
-col_t1, col_t2 = st.columns(2)
-with col_t1:
-    home_team = st.selectbox("Home Team:", team_list, index=0)
-with col_t2:
-    away_team = st.selectbox("Away Team:", team_list, index=1)
+# 1. Team Names Input
+col_n1, col_n2 = st.columns(2)
+with col_n1:
+    home_team = st.text_input("Home Team Name:", value="Broncos")
+with col_n2:
+    away_team = st.text_input("Away Team Name:", value="Rabbitohs")
 
 st.divider()
 
-# 2. Advanced Game Variables
-st.subheader("🛠️ Match Conditions")
-
+# 2. General Game Environment
+st.subheader("☀️ Environment")
 weather_cond = st.selectbox("Weather Condition:", ["Dry", "Wet / Rain"])
 
-col_v1, col_v2 = st.columns(2)
-with col_v1:
-    st.markdown(f"**{home_team} (Home)**")
-    h_inj = st.slider("Missing Key Players:", 0, 5, 0, key="h_inj")
-    h_turn = st.radio("Turnaround Time:", ["Normal (6+ days)", "Short (5 days)"], key="h_turn")
+st.divider()
 
-with col_v2:
-    st.markdown(f"**{away_team} (Away)**")
-    a_inj = st.slider("Missing Key Players :", 0, 5, 0, key="a_inj")
-    a_turn = st.radio("Turnaround Time :", ["Normal (6+ days)", "Short (5 days)"], key="a_turn")
+# 3. Team Statistics Sliders
+col_s1, col_s2 = st.columns(2)
+
+with col_s1:
+    st.markdown(f"### 🏠 {home_team} Stats")
+    h_poss = st.slider(f"{home_team} Possession %", 20, 80, 50, step=1, key="h_pos")
+    h_comp = st.slider(f"{home_team} Completion %", 40, 100, 80, step=1, key="h_cm")
+    h_err = st.slider(f"{home_team} Errors", 0, 20, 4, step=1, key="h_er")
+    h_pen = st.slider(f"{home_team} Penalties Conceded", 0, 15, 3, step=1, key="h_pe")
+    h_inj = st.slider(f"{home_team} Missing Key Players", 0, 5, 0, step=1, key="h_in")
+    h_turn = st.radio(f"{home_team} Turnaround Time", ["Normal (6+ days)", "Short (5 days)"], key="h_tu")
+
+with col_s2:
+    st.markdown(f"### ✈️ {away_team} Stats")
+    # Automatically keeps possession equal to 100% total
+    a_poss = 100 - h_poss
+    st.write(f"**{away_team} Possession %:** {a_poss}%")
+    
+    a_comp = st.slider(f"{away_team} Completion %", 40, 100, 80, step=1, key="a_cm")
+    a_err = st.slider(f"{away_team} Errors", 0, 20, 4, step=1, key="a_er")
+    a_pen = st.slider(f"{away_team} Penalties Conceded", 0, 15, 3, step=1, key="a_pe")
+    a_inj = st.slider(f"{away_team} Missing Key Players", 0, 5, 0, step=1, key="a_in")
+    a_turn = st.radio(f"{away_team} Turnaround Time", ["Normal (6+ days)", "Short (5 days)"], key="a_tu")
 
 st.divider()
 
-# 3. Output Generation
+# 4. Result Processing
 if home_team == away_team:
-    st.warning("Please select two different teams.")
+    st.warning("Please enter two different team names.")
 else:
-    winner, bracket = run_advanced_prediction(home_team, away_team, weather_cond, h_inj, a_inj, h_turn, a_turn)
+    winner, bracket = run_fully_manual_prediction(
+        home_team, away_team, h_poss, a_poss, h_comp, a_comp, 
+        h_err, a_err, h_pen, a_pen, weather_cond, h_inj, a_inj, h_turn, a_turn
+    )
     
-    st.subheader("📊 Halftime Prediction Result")
+    st.subheader("📊 Generated Halftime Prediction")
     res_col1, res_col2 = st.columns(2)
     with res_col1:
-        st.markdown("**Expected HT Leader:**")
+        st.markdown("**Predicted HT Leader:**")
         st.info(f"🏆 {winner}")
     with res_col2:
-        st.markdown("**Expected HT Margin:**")
+        st.markdown("**Predicted HT Margin:**")
         st.success(f"📏 {bracket}")
