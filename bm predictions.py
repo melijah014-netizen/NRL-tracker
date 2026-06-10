@@ -1,9 +1,6 @@
-
-
 import streamlit as st
 
-# 1. DATABASE OF CURRENT NRL TEAM STATS
-# Contains real-world performance averages for automatic calculations
+# DATABASE OF BASE TEAM STATS
 nrl_teams_db = {
     "Brisbane Broncos": {"poss": 51, "comp": 78, "err": 10, "pen": 6, "hist_ht": 2.1},
     "Canberra Raiders": {"poss": 49, "comp": 76, "err": 11, "pen": 7, "hist_ht": -0.5},
@@ -24,19 +21,28 @@ nrl_teams_db = {
     "Wests Tigers": {"poss": 46, "comp": 73, "err": 13, "pen": 9, "hist_ht": -4.2}
 }
 
-def run_match_prediction(home_name, away_name):
-    # Pull data from database automatically
+def run_advanced_prediction(home_name, away_name, weather, h_injuries, a_injuries, h_turnaround, a_turnaround):
     home = nrl_teams_db[home_name]
     away = nrl_teams_db[away_name]
     
-    # Calculate score using formula
-    h_score = (home["poss"] * 0.4) + (home["comp"] * 0.3) - (home["err"] * 1.5) - (home["pen"] * 2.0) + home["hist_ht"]
-    a_score = (away["poss"] * 0.4) + (away["comp"] * 0.3) - (away["err"] * 1.5) - (away["pen"] * 2.0) + away["hist_ht"]
+    # Adjust error severity based on weather
+    error_weight = 2.5 if weather == "Wet / Rain" else 1.5
+    
+    # Base Calculation
+    h_score = (home["poss"] * 0.4) + (home["comp"] * 0.3) - (home["err"] * error_weight) - (home["pen"] * 2.0) + home["hist_ht"]
+    a_score = (away["poss"] * 0.4) + (away["comp"] * 0.3) - (away["err"] * error_weight) - (away["pen"] * 2.0) + away["hist_ht"]
+    
+    # Apply Injury Penalties (-2.5 points per missing key player)
+    h_score -= (h_injuries * 2.5)
+    a_score -= (a_injuries * 2.5)
+    
+    # Apply Turnaround Penalties (Short 5-day turnaround hurts performance)
+    if h_turnaround == "Short (5 days)": h_score -= 1.5
+    if a_turnaround == "Short (5 days)": a_score -= 1.5
     
     margin = h_score - a_score
     abs_margin = abs(margin)
     
-    # Format the bracket output (1-8 or 9+)
     if margin > 1.5:
         winner = home_name
         bracket = "1-8 points" if abs_margin <= 8 else "9+ points"
@@ -49,31 +55,51 @@ def run_match_prediction(home_name, away_name):
         
     return winner, bracket
 
-# 2. STREAMLIT APP VISUAL INTERFACE
-st.title("🏈 Instant NRL HT Match Predictor")
-st.write("Pick any two teams. The app calculates the rest instantly.")
+# STREAMLIT USER INTERFACE
+st.title("🏈 Advanced NRL HT Predictor")
+st.write("Customise match variables to generate real-time halftime predictions.")
 
 st.divider()
 
-# Dropdown selectors for the user
+# 1. Team Selection
 team_list = sorted(list(nrl_teams_db.keys()))
-home_team = st.selectbox("Select Home Team:", team_list, index=0)
-away_team = st.selectbox("Select Away Team:", team_list, index=1)
+col_t1, col_t2 = st.columns(2)
+with col_t1:
+    home_team = st.selectbox("Home Team:", team_list, index=0)
+with col_t2:
+    away_team = st.selectbox("Away Team:", team_list, index=1)
 
 st.divider()
 
-# Generate calculation automatically when teams change
+# 2. Advanced Game Variables
+st.subheader("🛠️ Match Conditions")
+
+weather_cond = st.selectbox("Weather Condition:", ["Dry", "Wet / Rain"])
+
+col_v1, col_v2 = st.columns(2)
+with col_v1:
+    st.markdown(f"**{home_team} (Home)**")
+    h_inj = st.slider("Missing Key Players:", 0, 5, 0, key="h_inj")
+    h_turn = st.radio("Turnaround Time:", ["Normal (6+ days)", "Short (5 days)"], key="h_turn")
+
+with col_v2:
+    st.markdown(f"**{away_team} (Away)**")
+    a_inj = st.slider("Missing Key Players :", 0, 5, 0, key="a_inj")
+    a_turn = st.radio("Turnaround Time :", ["Normal (6+ days)", "Short (5 days)"], key="a_turn")
+
+st.divider()
+
+# 3. Output Generation
 if home_team == away_team:
-    st.warning("Please select two different teams to play each other.")
+    st.warning("Please select two different teams.")
 else:
-    winner, bracket = run_match_prediction(home_team, away_team)
+    winner, bracket = run_advanced_prediction(home_team, away_team, weather_cond, h_inj, a_inj, h_turn, a_turn)
     
     st.subheader("📊 Halftime Prediction Result")
-    
-    col1, col2 = st.columns(2)
-    with col1:
+    res_col1, res_col2 = st.columns(2)
+    with res_col1:
         st.markdown("**Expected HT Leader:**")
         st.info(f"🏆 {winner}")
-    with col2:
+    with res_col2:
         st.markdown("**Expected HT Margin:**")
         st.success(f"📏 {bracket}")
