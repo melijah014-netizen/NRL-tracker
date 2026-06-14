@@ -1,0 +1,34 @@
+name: NRL Automation Engine
+
+on:
+  schedule:
+    # Triggers every Wednesday night at 7 PM AEST (9:00 AM UTC) to pull locked lineups
+    - cron: '0 9 * * 3'
+  workflow_dispatch: # Puts a manual 'Run workflow' click button inside your GitHub Actions panel
+
+jobs:
+  run-predictor:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Access Repository Source
+      uses: actions/checkout@v4
+
+    - name: Initialize Python Core Environment
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Inject System Script Extensions
+      run: pip install pandas requests
+
+    - name: Execute Model Compilation
+      # This runs your specific prediction file name
+      run: python "bm predictions.py"
+
+    - name: Push Compiled Changes Back to Repository Home Page
+      run: |
+        git config --global user.name "NRL-Prediction-Bot"
+        git config --global user.email "predictor-bot@github.com"
+        git add README.md
+        git diff-index --quiet HEAD || git commit -m "Automated halftime tracking execution updates"
+        git push
