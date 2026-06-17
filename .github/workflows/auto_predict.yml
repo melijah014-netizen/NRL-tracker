@@ -28,13 +28,13 @@ jobs:
     - name: Execute Model Compilation
       run: python "bm predictions.py"
 
-          - name: Push Compiled Changes Back to Repository Home Page
+              - name: Push Compiled Changes Back to Repository Home Page
         run: |
           git config --global user.name "NRL-Prediction-Bot"
           git config --global user.email "bot@example.com"
-          git fetch origin main
+          git fetch origin
           git reset --soft origin/main
           git add README.md
-          git commit -m "Automated halftime tracking execution updates" || echo "No new updates"
+          git commit -m "Automated halftime tracking execution updates" || echo "No changes"
           git push origin main --force
 
