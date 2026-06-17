@@ -1,9 +1,5 @@
 
-on:
-  schedule:
-    # Triggers every Wednesday night at 7 PM AEST (9:00 AM UTC) to pull locked lineups
-    - cron: '0 9 * * 3'
-  name: NRL Automation Engine
+name: NRL Automation Engine
 
 on:
   schedule:
@@ -14,27 +10,26 @@ jobs:
   run-predictor:
     runs-on: ubuntu-latest
     steps:
-    - name: Access Repository Source
-      uses: actions/checkout@v4
+      - name: Access Repository Source
+        uses: actions/checkout@v4
 
-    - name: Initialize Python Core Environment
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
+      - name: Initialize Python Core Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    - name: Inject System Script Extensions
-      run: pip install pandas requests
+      - name: Inject System Script Extensions
+        run: pip install pandas requests
 
-    - name: Execute Model Compilation
-      run: python "bm predictions.py"
+      - name: Execute Model Compilation
+        run: python "bm predictions.py"
 
-              - name: Push Compiled Changes Back to Repository Home Page
+      - name: Push Compiled Changes Back to Repository Home Page
         run: |
           git config --global user.name "NRL-Prediction-Bot"
           git config --global user.email "bot@example.com"
-          git fetch origin
+          git fetch origin main
           git reset --soft origin/main
           git add README.md
           git commit -m "Automated halftime tracking execution updates" || echo "No changes"
           git push origin main --force
-
