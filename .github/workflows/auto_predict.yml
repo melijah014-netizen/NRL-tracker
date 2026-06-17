@@ -28,11 +28,13 @@ jobs:
     - name: Execute Model Compilation
       run: python "bm predictions.py"
 
-    - name: Push Compiled Changes Safely
-      run: |
-        git config --global user.name "NRL-Prediction-Bot"
-        git config --global user.email "predictor-bot@github.com"
-        git add README.md
-        # The line below allows the script to finish cleanly even if no new changes are found
-        git diff-index --quiet HEAD || git commit -m "Automated halftime tracking execution updates"
-        git push || echo "No changes to deploy or remote up to date."
+          - name: Push Compiled Changes Back to Repository Home Page
+        run: |
+          git config --global user.name "NRL-Prediction-Bot"
+          git config --global user.email "bot@example.com"
+          git fetch origin main
+          git reset --soft origin/main
+          git add README.md
+          git commit -m "Automated halftime tracking execution updates" || echo "No new updates"
+          git push origin main --force
+
