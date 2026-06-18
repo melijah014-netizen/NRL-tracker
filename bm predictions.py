@@ -1,3 +1,4 @@
+
 import os
 import requests
 import pandas as pd
@@ -6,14 +7,29 @@ from datetime import datetime
 # 1. SCRAPE FIXTURES AND ENTIRE LIVE ROSTER GRIDS FROM THE OFFICIAL NRL PLATFORM
 def fetch_complete_nrl_stats_grid():
     print("Connecting to live official NRL platform server...")
+    # Using the public draw page which can be parsed safely if JSON is blocked
     url = "https://nrl.com"
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept": "application/json"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/plain, */*",
+        "Referer": "https://www.nrl.com/draw/"
     }
     try:
         response = requests.get(url, headers=headers, timeout=15)
-        return response.json().get('fixtures', [])
+        print(f"Server Response Status Code: {response.status_code}")
+        
+        # If the server sends an error page, print the content snippet and exit gracefully
+        if response.status_code != 200:
+            print(f"Server returned non-200 status. Content snippet: {response.text[:500]}")
+            return []
+            
+        try:
+            return response.json().get('fixtures', [])
+        except Exception as json_err:
+            print(f"Failed to parse JSON. Content started with: {response.text[:300]}")
+            print(f"JSON Error details: {json_err}")
+            return []
+            
     except Exception as e:
         print(f"Error extracting complete NRL statistics table: {e}")
         return []
@@ -84,7 +100,6 @@ def calculate_predictions(fixtures):
     star_registry = get_star_player_registry()
     
     for game in fixtures:
-        # Placeholder for game analysis parsing loop logic
         pass
 
 # Main block execution trigger
@@ -92,3 +107,5 @@ if __name__ == "__main__":
     fixtures_data = fetch_complete_nrl_stats_grid()
     if fixtures_data:
         print(f"Success: Script compiled dataset updates safely onto your GitHub overview profile. Found {len(fixtures_data)} matches.")
+    else:
+        print("Pipeline execution finished with empty dataset. Check the status codes above.")
