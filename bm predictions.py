@@ -1,3 +1,4 @@
+
 import os
 import requests
 from datetime import datetime
@@ -19,12 +20,35 @@ def fetch_complete_nrl_stats_grid():
         return []
 
 # ---------------------------------------------------------
-# 2. HISTORIC BACKTESTING AND MACHINE LEARNING CALIBRATION LOOP
+# 2. FIXED POWER ANALYZER ENGINE
+# ---------------------------------------------------------
+def analyze_team_power(competitor_obj):
+    try:
+        records = competitor_obj.get('records', [])
+        win_count = 0
+        total_games = 1
+        
+        if records:
+            # Safely handle list structures or dictionary formats from ESPN
+            record_item = records[0] if isinstance(records, list) else records
+            summary = record_item.get('summary', '0-0')
+            if '-' in summary:
+                parts = summary.split('-')
+                win_count = int(parts[0])
+                total_games = win_count + int(parts[1])
+                if total_games == 0: total_games = 1
+                
+        win_ratio = win_count / total_games
+        return win_ratio * 100
+    except Exception:
+        return 50.0
+
+# ---------------------------------------------------------
+# 3. HISTORIC BACKTESTING AND MACHINE LEARNING CALIBRATION LOOP
 # ---------------------------------------------------------
 def run_historic_backtest_engine():
     print("Running historic backtesting verification loop...")
     
-    # Real-world historical finalized match data records used to train the machine
     historical_match_records = [
         {"home": "Knights", "away": "Dragons", "actual_leader": "Knights", "actual_margin": "1-8 Pts"},
         {"home": "Wests Tigers", "away": "Dolphins", "actual_leader": "Dolphins", "actual_margin": "9+ Pts"},
@@ -32,16 +56,12 @@ def run_historic_backtest_engine():
         {"home": "Bulldogs", "away": "Sea Eagles", "actual_leader": "Bulldogs", "actual_margin": "1-8 Pts"}
     ]
     
-    # Baseline analytical parameters to calibrate
     best_accuracy = 0.0
     optimal_home_advantage = 3.0
     optimal_margin_threshold = 12.0
     
-    # Hardcoded baseline form variables for specific teams
     power_dict = {"Panthers": 85, "Storm": 88, "Dolphins": 70, "Roosters": 74, "Knights": 62, "Dragons": 55, "Wests Tigers": 45, "Titans": 48, "Bulldogs": 65, "Sea Eagles": 63}
     
-    print("Self-adjusting model parameters across historical data arrays...")
-    # Loop over parameter spaces to find optimal configurations
     for trial_home_adv in [1.0, 2.0, 3.0, 4.0, 5.0]:
         for trial_threshold in [8.0, 10.0, 12.0, 14.0]:
             correct_predictions = 0
@@ -63,11 +83,10 @@ def run_historic_backtest_engine():
                 optimal_home_advantage = trial_home_adv
                 optimal_margin_threshold = trial_threshold
 
-    print(f"Optimal alignment established. Best Historic Accuracy Score: {best_accuracy * 100}%")
     return optimal_home_advantage, optimal_margin_threshold, best_accuracy
 
 # ---------------------------------------------------------
-# 3. LIVE GENERATION PIPELINE AND MARKDOWN OUTPUT GENERATION
+# 4. LIVE GENERATION PIPELINE AND MARKDOWN OUTPUT GENERATION
 # ---------------------------------------------------------
 def update_readme(fixtures, home_adv, margin_thresh, historic_acc):
     print("Compiling live predictions and writing to README.md...")
@@ -102,7 +121,7 @@ System Tracker Status: Active | Latest Sync Update: {datetime.now().strftime('%Y
     for game in fixtures:
         try:
             competitions = game.get('competitions', [{}])
-            competitors = competitions.get('competitors', [])
+            competitors = competitions[0].get('competitors', []) if isinstance(competitions, list) else competitions.get('competitors', [])
             
             home_team, away_team = "Unknown", "Unknown"
             
@@ -116,14 +135,12 @@ System Tracker Status: Active | Latest Sync Update: {datetime.now().strftime('%Y
                 if ' at ' in short_name:
                     away_team, home_team = short_name.split(' at ')
 
-            # Apply optimized mathematical weights resolved during backtesting phase
             home_power = power_dict.get(home_team, 55) + home_adv
             away_power = power_dict.get(away_team, 50)
             
             power_differential = abs(home_power - away_power)
             predicted_leader = home_team if home_power > away_power else away_team
             
-            # Select margin brackets using calibrated calculation parameters
             if power_differential >= margin_thresh:
                 margin_bracket = "9+ Pts"
             else:
@@ -136,18 +153,13 @@ System Tracker Status: Active | Latest Sync Update: {datetime.now().strftime('%Y
 
     with open("README.md", "w", encoding="utf-8") as f:
         f.write(readme_content.strip() + "\n")
-    print("README.md updated with self-adjusted forecast array.")
+    print("README.md updated successfully.")
 
 # ---------------------------------------------------------
-# 4. ENTRY EXECUTION BLOCK
+# 5. ENTRY EXECUTION BLOCK
 # ---------------------------------------------------------
 if __name__ == "__main__":
-    # Phase 1: Calibrate parameters by scanning past performance metrics
     opt_home, opt_thresh, acc_score = run_historic_backtest_engine()
-    
-    # Phase 2: Pull the current calendar round details
     fixtures_data = fetch_complete_nrl_stats_grid()
-    
-    # Phase 3: Update interface overview profile documentation
     update_readme(fixtures_data, opt_home, opt_thresh, acc_score)
     print("Pipeline compilation completely finished.")
