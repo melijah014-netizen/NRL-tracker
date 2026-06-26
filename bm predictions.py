@@ -139,7 +139,7 @@ System Tracker Status: Active | Latest Sync Update: {datetime.now().strftime('%Y
         ("Warriors", "Tigers"),
         ("Panthers", "Cowboys"),
         ("Storm", "Dolphins"),
-        ("Raiders"), "Knights"),
+        ("Raiders", "Knights"),
         ("Roosters", "Broncos"),
         ("Dragons", "Sea Eagles")
     ]
